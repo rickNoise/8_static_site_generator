@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -43,6 +43,49 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_to_html_h1(self):
         node = LeafNode("h1", "Heading 1", None)
         self.assertEqual(node.to_html(), "<h1>Heading 1</h1>")
+    
+    def test_parent_to_html_basic1(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+        )
+        expected_out = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        self.assertEqual(node.to_html(), expected_out)
+    
+    def test_to_html_with_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+        )
+    
+    def test_to_html_with_none_children(self):
+        parent_node = ParentNode("a", None)
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+
+    def test_to_html_with_empty_children_list(self):
+        parent_node = ParentNode("a", [])
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+
+    def test_to_html_with_invalid_children_type(self):
+        parent_node = ParentNode("a", "this is not a list")
+        with self.assertRaises(ValueError) as context:
+            parent_node.to_html()
+
 
 if __name__ == "__main__":
     unittest.main()
