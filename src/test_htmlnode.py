@@ -1,6 +1,8 @@
 import unittest
 
 from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import text_node_to_html_node
+from textnode import TextNode, TextType
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -86,6 +88,30 @@ class TestHTMLNode(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             parent_node.to_html()
 
+    def test_text_node_text(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+
+    def test_text_node_bold(self):
+        node = TextNode("This is a bold text node", TextType.BOLD)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "b")
+        self.assertEqual(html_node.value, "This is a bold text node")
+
+    def test_text_node_link(self):
+        node = TextNode("This is a link text node", TextType.LINK, url="www.google.com")
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "a")
+        self.assertEqual(
+            html_node.props, 
+            { "href": "www.google.com" }
+        )
+        self.assertEqual(
+            html_node.to_html(), 
+            '<a href="www.google.com">This is a link text node</a>'
+        )
 
 if __name__ == "__main__":
     unittest.main()
