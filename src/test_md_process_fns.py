@@ -163,8 +163,8 @@ class TestSplitNodesDelimiter(unittest.TestCase):
     
     def test_split_node_many_inputs_bold(self):
         node1 = TextNode("This is *text* with a `code block` word", TextType.TEXT)
-        node2 = TextNode("italicised string", TextType.BOLD)
-        node3 = TextNode("This is *another* string with *italics*", TextType.TEXT)
+        node2 = TextNode("bolded string", TextType.BOLD)
+        node3 = TextNode("This is *another* string with *bold*", TextType.TEXT)
         new_nodes = split_nodes_delimiter(
             [ node1, node2, node3 ],
             "**",
@@ -176,11 +176,11 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                 TextNode("This is ", TextType.TEXT),
                 TextNode("text", TextType.BOLD),
                 TextNode(" with a `code block` word", TextType.TEXT),
-                TextNode("italicised string", TextType.BOLD),
+                TextNode("bolded string", TextType.BOLD),
                 TextNode("This is ", TextType.TEXT),
                 TextNode("another", TextType.BOLD),
                 TextNode(" string with ", TextType.TEXT),
-                TextNode("italics", TextType.BOLD),
+                TextNode("bold", TextType.BOLD),
             ]
         )
 
