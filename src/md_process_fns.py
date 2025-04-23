@@ -43,8 +43,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def split_string_by_delimiter(text, delimiter):
-    # assumes delimiter is a single character!
-    # input 'text': a string
+    # WIP -->> assumes delimiter is a single character!
+    # input 'text': a string; 'delimiter': a string
     # output: a list of objects of the form:
     # { "text": "slice of text", "was_delimited": bool }
     # "was_delimited" tells you whether or not that slice was surrounded by delimiters
@@ -54,11 +54,15 @@ def split_string_by_delimiter(text, delimiter):
     
     if not text: # if input is the empty string
         return []
+
+    # if the delimiter string is empty or not a string
+    if len(delimiter) == 0 or not isinstance(delimiter, str):
+        raise Exception("delimiter must be a non empty string")
     
-    delimiter_indexes = []
-    for idx in range(len(text)):
-        if text[idx] == delimiter:
-            delimiter_indexes.append(idx)
+    try:
+        delimiter_indexes = delim_index_builder(text, delimiter)
+    except Exception as delim_index_builder_exception:
+        raise delim_index_builder_exception
 
     # check for case of finding no delimiters
     if not delimiter_indexes:
@@ -110,3 +114,30 @@ def split_string_by_delimiter(text, delimiter):
         )
 
     return return_lst
+
+
+def delim_index_builder(text, delimiter):
+    """
+    inputs -> text: str, delimiter: str
+    output -> index_list: list of tuples
+    each item in the list represents an occurence of the delimiter in the text string
+    the first int in the tuple is the char index in the string in which the delimiter starts
+    the second int in the tuple is the char index in the string in which the delimiter ends
+    e.g. if the text is "012**b**89" and the delimiter is "**"
+    ---> output should be: [(3, 4), (6, 7)]
+    Assume the delimiter is a string and is not empty.
+    """
+    if len(delimiter) == 0 or not isinstance(delimiter, str):
+        raise Exception("delimiter must be a non-empty string")
+    delimiter_length = len(delimiter)
+    delimiter_indexes = []
+    print(f"\nentering idx for loop with delimiter_length: {delimiter_length}")
+    for idx in range(len(text) - (delimiter_length - 1)):
+        print(f"checking idx: {idx}, checking if: {text[idx:idx+(delimiter_length)]} matches delimiter: {delimiter}")
+        if text[idx:idx+delimiter_length] == delimiter:
+            print(f"found a match! ")
+            delimiter_indexes.append(
+                (idx, idx+delimiter_length - 1)
+            )
+    print(f"returning delimiter_indexes: {delimiter_indexes}")
+    return delimiter_indexes

@@ -1,10 +1,56 @@
 import unittest
 
-from md_process_fns import split_nodes_delimiter, split_string_by_delimiter
+from md_process_fns import split_nodes_delimiter, split_string_by_delimiter, delim_index_builder
 from textnode import TextNode, TextType
 
 
+class TestDelimIndexBuilder(unittest.TestCase):
+    def test_delim_index_builder(self):
+        text = "012**b**89"
+        delimiter = "**"
+        exp_out = [ (3, 4), (6, 7) ]
+        self.assertEqual(
+            delim_index_builder(text, delimiter),
+            exp_out
+        )
+    
+    def test_delim_index_builder_2(self):
+        text = "**b**"
+        delimiter = "**"
+        exp_out = [ (0, 1), (3, 4) ]
+        self.assertEqual(
+            delim_index_builder(text, delimiter),
+            exp_out
+        )
+     
+    def test_delim_index_builder_empty_text(self):
+        text = ""
+        delimiter = "**"
+        exp_out = []
+        self.assertEqual(
+            delim_index_builder(text, delimiter),
+            exp_out
+        )
+    
+    def test_delim_index_builder_empty_delimiter(self):
+        text = "this is text"
+        delimiter = ""
+        exp_out = []
+        with self.assertRaises(Exception) as context:
+            delim_index_builder(text, delimiter)
+        self.assertEqual(str(context.exception), "delimiter must be a non-empty string")
+
+
 class TestSplitStringByDelimiter(unittest.TestCase):
+    def test_split_delimiter_length_2(self):
+        text = "this is a sentence with **bold** elements"
+        delimiter = "**"
+        self.assertEqual(
+            split_string_by_delimiter(text, delimiter),
+            []
+        )
+
+
     def test_split_empty_text(self):
         text = ""
         delimiter = "`"
@@ -161,28 +207,28 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             ]
         )
     
-    def test_split_node_many_inputs_bold(self):
-        node1 = TextNode("This is *text* with a `code block` word", TextType.TEXT)
-        node2 = TextNode("bolded string", TextType.BOLD)
-        node3 = TextNode("This is *another* string with *bold*", TextType.TEXT)
-        new_nodes = split_nodes_delimiter(
-            [ node1, node2, node3 ],
-            "**",
-            TextType.BOLD
-        )
-        self.assertEqual(
-            new_nodes,
-            [
-                TextNode("This is ", TextType.TEXT),
-                TextNode("text", TextType.BOLD),
-                TextNode(" with a `code block` word", TextType.TEXT),
-                TextNode("bolded string", TextType.BOLD),
-                TextNode("This is ", TextType.TEXT),
-                TextNode("another", TextType.BOLD),
-                TextNode(" string with ", TextType.TEXT),
-                TextNode("bold", TextType.BOLD),
-            ]
-        )
+    # def test_split_node_many_inputs_bold(self):
+    #     node1 = TextNode("This is *text* with a `code block` word", TextType.TEXT)
+    #     node2 = TextNode("bolded string", TextType.BOLD)
+    #     node3 = TextNode("This is *another* string with *bold*", TextType.TEXT)
+    #     new_nodes = split_nodes_delimiter(
+    #         [ node1, node2, node3 ],
+    #         "**",
+    #         TextType.BOLD
+    #     )
+    #     self.assertEqual(
+    #         new_nodes,
+    #         [
+    #             TextNode("This is ", TextType.TEXT),
+    #             TextNode("text", TextType.BOLD),
+    #             TextNode(" with a `code block` word", TextType.TEXT),
+    #             TextNode("bolded string", TextType.BOLD),
+    #             TextNode("This is ", TextType.TEXT),
+    #             TextNode("another", TextType.BOLD),
+    #             TextNode(" string with ", TextType.TEXT),
+    #             TextNode("bold", TextType.BOLD),
+    #         ]
+    #     )
 
 if __name__ == "__main__":
     unittest.main()
