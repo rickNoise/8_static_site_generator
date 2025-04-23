@@ -46,16 +46,12 @@ def split_string_by_delimiter(text, delimiter):
     # output: a list of objects of the form:
     # { "text": "slice of text", "was_delimited": bool }
     # "was_delimited" tells you whether or not that slice was surrounded by delimiters
-    # # note delimiter characters are excluded for list partition
+    # delimiter characters are excluded for text slices
+    # empty slices are ignored and thrown away in all instances
     # raise Exception if there is unmatched delimiter(s)
     
     if not text: # if input is the empty string
-        return [
-            {
-                "text": text,
-                "was_delimited": False
-            }
-        ]
+        return []
     
     delimiter_indexes = []
     for idx in range(len(text)):
@@ -92,14 +88,15 @@ def split_string_by_delimiter(text, delimiter):
         open_delim = delimiter_indexes[i]
         close_delim = delimiter_indexes[i+1]
         text_slice = text[ open_delim + 1 : close_delim ]
-        was_delimited = (i % 2 == 0) 
-        print(f"text_slice to append: '{text_slice}' with was_deliimted: {was_delimited}")
-        return_lst.append(
-            {
-                "text": text_slice,
-                "was_delimited": was_delimited
-            }
-        )
+        if text_slice:
+            was_delimited = (i % 2 == 0)
+            print(f"text_slice to append: '{text_slice}' with was_delimited: {was_delimited}")
+            return_lst.append(
+                {
+                    "text": text_slice,
+                    "was_delimited": was_delimited
+                }
+            )
     # add the slice of remaining text after last delimiter
     if text[delimiter_indexes[-1]+1:]:
         print(f"trailing text_slice to add: '{text[delimiter_indexes[-1]+1:]}'")

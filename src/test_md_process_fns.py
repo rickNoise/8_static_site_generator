@@ -10,12 +10,7 @@ class TestSplitStringByDelimiter(unittest.TestCase):
         delimiter = "`"
         self.assertEqual(
             split_string_by_delimiter(text, delimiter),
-            [
-                {
-                    "text": text,
-                    "was_delimited": False
-                }
-            ]
+            []
         )
     
     def test_split_with_no_delimiter_found(self):
@@ -29,6 +24,22 @@ class TestSplitStringByDelimiter(unittest.TestCase):
                     "was_delimited": False
                 }
             ]
+        )
+    
+    def test_split_with_only_delimiters_found_single(self):
+        text = "``"
+        delimiter = "`"
+        self.assertEqual(
+            split_string_by_delimiter(text, delimiter),
+            []
+        )
+    
+    def test_split_with_only_delimiters_found_double(self):
+        text = "````"
+        delimiter = "`"
+        self.assertEqual(
+            split_string_by_delimiter(text, delimiter),
+            []
         )
     
     def test_split_unmatched_delimiter_single(self):
