@@ -41,9 +41,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return return_lst
 
 
-
 def split_string_by_delimiter(text, delimiter):
-    # WIP -->> assumes delimiter is a single character!
     # input 'text': a string; 'delimiter': a string
     # output: a list of objects of the form:
     # { "text": "slice of text", "was_delimited": bool }
@@ -57,8 +55,8 @@ def split_string_by_delimiter(text, delimiter):
 
     # if the delimiter string is empty or not a string
     if len(delimiter) == 0 or not isinstance(delimiter, str):
-        raise Exception("delimiter must be a non empty string")
-    
+        raise Exception("delimiter must be a non-empty string")
+
     try:
         delimiter_indexes = delim_index_builder(text, delimiter)
     except Exception as delim_index_builder_exception:
@@ -79,24 +77,20 @@ def split_string_by_delimiter(text, delimiter):
 
     return_lst = [] 
     # add the slice (if any) up to the first delimiter
-    if text[:delimiter_indexes[0]]:
-        # print(f"leading text_slice to add: '{text[:delimiter_indexes[0]]}'")
+    if delimiter_indexes[0][0] > 0:
         return_lst.append(
             {
-                "text": text[:delimiter_indexes[0]],
+                "text": text[:delimiter_indexes[0][0]],
                 "was_delimited": False
             }
         )
-    # iterate through every *other* index, slicing the text string 
-    # between the index and the next index from the list of delimiter indexes
-    # and adding the slice to the return_lst
-    for i in range(0, len(delimiter_indexes) - 1):
-        open_delim = delimiter_indexes[i]
-        close_delim = delimiter_indexes[i+1]
-        text_slice = text[ open_delim + 1 : close_delim ]
+    # iterate through delimiter_indexes, excluding the last one
+    for i in range(len(delimiter_indexes) - 1):
+        starting_char = delimiter_indexes[i][1] + 1 #start at the character after the end of the first delimiter 
+        ending_char = delimiter_indexes[i + 1][0] #end at the first index of the next delimiter
+        text_slice = text[ starting_char : ending_char ]
         if text_slice:
             was_delimited = (i % 2 == 0)
-            # print(f"text_slice to append: '{text_slice}' with was_delimited: {was_delimited}")
             return_lst.append(
                 {
                     "text": text_slice,
@@ -104,11 +98,11 @@ def split_string_by_delimiter(text, delimiter):
                 }
             )
     # add the slice of remaining text after last delimiter
-    if text[delimiter_indexes[-1]+1:]:
-        # print(f"trailing text_slice to add: '{text[delimiter_indexes[-1]+1:]}'")
+    if delimiter_indexes[-1][1] != len(text) - 1:
+        starting_char = delimiter_indexes[-1][1] + 1
         return_lst.append(
             {
-                "text": text[delimiter_indexes[-1]+1:],
+                "text": text[starting_char:],
                 "was_delimited": False
             }
         )
@@ -131,13 +125,9 @@ def delim_index_builder(text, delimiter):
         raise Exception("delimiter must be a non-empty string")
     delimiter_length = len(delimiter)
     delimiter_indexes = []
-    print(f"\nentering idx for loop with delimiter_length: {delimiter_length}")
     for idx in range(len(text) - (delimiter_length - 1)):
-        print(f"checking idx: {idx}, checking if: {text[idx:idx+(delimiter_length)]} matches delimiter: {delimiter}")
         if text[idx:idx+delimiter_length] == delimiter:
-            print(f"found a match! ")
             delimiter_indexes.append(
                 (idx, idx+delimiter_length - 1)
             )
-    print(f"returning delimiter_indexes: {delimiter_indexes}")
     return delimiter_indexes
