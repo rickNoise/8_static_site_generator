@@ -126,7 +126,63 @@ class TestSplitStringByDelimiter(unittest.TestCase):
         )
     
 class TestSplitNodesDelimiter(unittest.TestCase):
-    pass
+    def test_split_node_bootdev_example(self):
+        node = TextNode("This is text with a `code block` word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" word", TextType.TEXT),
+            ]
+        )
+    
+    def test_split_node_many_inputs_italic(self):
+        node1 = TextNode("This is _text_ with a `code block` word", TextType.TEXT)
+        node2 = TextNode("italicised string", TextType.ITALIC)
+        node3 = TextNode("This is _another_ string with _italics_", TextType.TEXT)
+        new_nodes = split_nodes_delimiter(
+            [ node1, node2, node3 ],
+            "_",
+            TextType.ITALIC
+        )
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.ITALIC),
+                TextNode(" with a `code block` word", TextType.TEXT),
+                TextNode("italicised string", TextType.ITALIC),
+                TextNode("This is ", TextType.TEXT),
+                TextNode("another", TextType.ITALIC),
+                TextNode(" string with ", TextType.TEXT),
+                TextNode("italics", TextType.ITALIC),
+            ]
+        )
+    
+    def test_split_node_many_inputs_bold(self):
+        node1 = TextNode("This is *text* with a `code block` word", TextType.TEXT)
+        node2 = TextNode("italicised string", TextType.BOLD)
+        node3 = TextNode("This is *another* string with *italics*", TextType.TEXT)
+        new_nodes = split_nodes_delimiter(
+            [ node1, node2, node3 ],
+            "**",
+            TextType.BOLD
+        )
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with a `code block` word", TextType.TEXT),
+                TextNode("italicised string", TextType.BOLD),
+                TextNode("This is ", TextType.TEXT),
+                TextNode("another", TextType.BOLD),
+                TextNode(" string with ", TextType.TEXT),
+                TextNode("italics", TextType.BOLD),
+            ]
+        )
 
 if __name__ == "__main__":
     unittest.main()

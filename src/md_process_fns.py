@@ -1,17 +1,3 @@
-"""
-Now that we can convert TextNodes to HTMLNodes, we need to be able to create TextNodes from raw markdown strings. 
-
-For example, the string:
-This is text with a **bolded phrase** in the middle
-
-Should become:
-[
-    TextNode("This is text with a ", TextType.TEXT),
-    TextNode("bolded phrase", TextType.BOLD),
-    TextNode(" in the middle", TextType.TEXT),
-]
-"""
-
 from textnode import TextNode, TextType
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -39,9 +25,25 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     if not old_nodes: # if input list is empty, just return it
         return old_nodes
     
-       
+    return_lst = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            return_lst.append(node)
+        else:
+            processed_text = split_string_by_delimiter(node.text, delimiter)
+            for obj in processed_text:
+                return_lst.append(
+                    TextNode(
+                        obj["text"],
+                        text_type if obj["was_delimited"] == True else TextType.TEXT 
+                    )
+                )
+    return return_lst
+
+
 
 def split_string_by_delimiter(text, delimiter):
+    # assumes delimiter is a single character!
     # input 'text': a string
     # output: a list of objects of the form:
     # { "text": "slice of text", "was_delimited": bool }
@@ -74,7 +76,7 @@ def split_string_by_delimiter(text, delimiter):
     return_lst = [] 
     # add the slice (if any) up to the first delimiter
     if text[:delimiter_indexes[0]]:
-        print(f"leading text_slice to add: '{text[:delimiter_indexes[0]]}'")
+        # print(f"leading text_slice to add: '{text[:delimiter_indexes[0]]}'")
         return_lst.append(
             {
                 "text": text[:delimiter_indexes[0]],
@@ -90,7 +92,7 @@ def split_string_by_delimiter(text, delimiter):
         text_slice = text[ open_delim + 1 : close_delim ]
         if text_slice:
             was_delimited = (i % 2 == 0)
-            print(f"text_slice to append: '{text_slice}' with was_delimited: {was_delimited}")
+            # print(f"text_slice to append: '{text_slice}' with was_delimited: {was_delimited}")
             return_lst.append(
                 {
                     "text": text_slice,
@@ -99,7 +101,7 @@ def split_string_by_delimiter(text, delimiter):
             )
     # add the slice of remaining text after last delimiter
     if text[delimiter_indexes[-1]+1:]:
-        print(f"trailing text_slice to add: '{text[delimiter_indexes[-1]+1:]}'")
+        # print(f"trailing text_slice to add: '{text[delimiter_indexes[-1]+1:]}'")
         return_lst.append(
             {
                 "text": text[delimiter_indexes[-1]+1:],
