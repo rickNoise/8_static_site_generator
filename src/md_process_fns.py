@@ -1,4 +1,5 @@
 from textnode import TextNode, TextType
+import re
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     """
@@ -40,7 +41,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 )
     return return_lst
 
-
+# helper fn for split_nodes_delimiter
 def split_string_by_delimiter(text, delimiter):
     # input 'text': a string; 'delimiter': a string
     # output: a list of objects of the form:
@@ -109,7 +110,7 @@ def split_string_by_delimiter(text, delimiter):
 
     return return_lst
 
-
+# helper fn for split_string_by_delimiter
 def delim_index_builder(text, delimiter):
     """
     inputs -> text: str, delimiter: str
@@ -131,3 +132,28 @@ def delim_index_builder(text, delimiter):
                 (idx, idx+delimiter_length - 1)
             )
     return delimiter_indexes
+
+def extract_markdown_images(text):
+    """
+    Create a function extract_markdown_images(text) that takes raw markdown text 
+    and returns a list of tuples.
+    Each tuple should contain the alt text and the URL of any markdown images.
+    For example:
+    text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+    print(extract_markdown_images(text))
+    # [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+    """
+    matches = re.findall(r"\!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches
+
+def extract_markdown_links(text):
+    """
+    Create a similar function extract_markdown_links(text) that extracts markdown links instead of images. 
+    It should return tuples of anchor text and URLs.
+    For example:
+    text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    print(extract_markdown_links(text))
+    # [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+    """
+    matches = re.findall(r"(?<!\!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches

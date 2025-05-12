@@ -2,7 +2,7 @@ import unittest
 
 from md_process_fns import split_nodes_delimiter, split_string_by_delimiter, delim_index_builder
 from textnode import TextNode, TextType
-
+from md_process_fns import extract_markdown_images, extract_markdown_links
 
 class TestDelimIndexBuilder(unittest.TestCase):
     def test_delim_index_builder(self):
@@ -246,6 +246,29 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                 TextNode(" string with ", TextType.TEXT),
                 TextNode("bold", TextType.BOLD),
             ]
+        )
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extract_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        self.assertEqual(
+            extract_markdown_images(text),
+            [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        )
+    
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_extract_markdown_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        self.assertEqual(
+            extract_markdown_links(text),
+            [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        )
+    
+    def test_extract_markdown_links_ignoring_images(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev). This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        self.assertEqual(
+            extract_markdown_links(text),
+            [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
         )
 
 if __name__ == "__main__":
