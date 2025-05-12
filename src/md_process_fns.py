@@ -157,3 +157,74 @@ def extract_markdown_links(text):
     """
     matches = re.findall(r"(?<!\!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return matches
+
+def split_nodes_image(old_nodes):
+    if not old_nodes:
+        return old_nodes
+    
+    return_lst = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            return_lst.append(node)
+        else:
+            matches = extract_markdown_images(node.text)
+            # if the text node has no images in it, just append it as is
+            if len(matches) == 0:
+                return_lst.append(node)
+            # if it does have images in it, process differently
+            else:
+                processed_nodes = recursive_match_processing(matches, node.text, [])
+                print(f"processed_nodes: {processed_nodes}")
+                for item in processed_nodes:
+                    return_lst.append(item)
+
+    print(f"about to return return_lst: {return_lst}")
+    return return_lst
+
+# helper fn for split_nodes_image
+def recursive_match_processing(matches, text, output_list=[]):
+    print(f"entering into recursive_match_processing... with matches: {matches} and remaining_text: {text}")
+    # returns an array of TextNodes
+    
+    # base case
+    if len(matches) == 0:
+        return output_list
+
+    # recursive case
+    match = matches[0]
+    print(f"processing match: {match}")
+    split_text = text.split(f"![{match[0]}]({match[1]})", 1)
+    print(f"split_text is: {split_text}")
+
+    # create a Text type TextNode for the initial text before the image
+    if split_text[0] != "":
+        output_list.append(
+            TextNode(split_text[0], TextType.TEXT)
+        )
+    
+    # create an Image type TextNode for the image itself
+    output_list.append(
+        TextNode(match[0], TextType.IMAGE, match[1])
+    )
+    # if there are remaining matches after this one, run again recursively
+    if len(matches) > 1:
+        remaining_matches = matches[1:]
+        if len(split_text) > 1:
+            remaining_text = split_text[1]
+        else:
+            remaining_text = ""
+        print(f"about to recurse with current output_list: {output_list}")
+        output_list.extend(recursive_match_processing(remaining_matches, remaining_text, []))
+        return output_list
+    # if no remaining matches after this one
+    else:
+        # covers the trailing text left after the last image match
+        if len(split_text) > 1 and len(split_text[1]) > 0:
+            output_list.append(
+                TextNode(split_text[1], TextType.TEXT)
+            )
+        print(f"about to return output_list: {output_list}")
+        return output_list
+
+def split_nodes_link(old_nodes):
+    pass
