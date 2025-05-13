@@ -17,13 +17,9 @@ def markdown_to_blocks(markdown):
     """
 
     blocks = markdown.split("\n\n")
-    print(f"blocks pre prcoessing: {blocks}")
     for i in range(len(blocks)):
-        print(f"current block reviewed... {blocks[i]}")
         blocks[i] = blocks[i].strip()
     for block in blocks:
         if not block:
             blocks.remove(block)
-
-    print(f"returning blocks: {blocks}")
     return blocks
