@@ -2,7 +2,7 @@ from textnode import TextNode, TextType
 from md_process_fns import *
 
 def text_to_textnodes(text):
-    print(f"RUNNING TEXT_TO_TEXTNODES with input {text}")
+    # print(f"RUNNING TEXT_TO_TEXTNODES with input {text}")
     nodes = [TextNode(text, TextType.TEXT)]
 
     # BOLD text
